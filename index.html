@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Weather App</h2>
+    <form id="formdata">
+      <div>
+        <label for="cityName">Enter your City: </label>
+        <input type="text" name="cityName" id="cityName" required>
+      </div>
+      <button type="submit">Find</button>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById('formdata').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      // Get the city name from the form
+      const formdata = new FormData(event.target);
+      const cityName = formdata.get('cityName');
+
+      // Send POST request to the server
+      const response = await fetch('/find', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cityName }),
+      });
+
+      const resultDiv = document.getElementById('result');
+
+      if (response.ok) {
+        const data = await response.json();
+        resultDiv.innerHTML = `
+          <h2>Weather in ${data.name}</h3>
+          <p>Temperature: ${data.temp}°C</p>
+          <p>Description: ${data.description}</p>
+          <p>Wind Speed: ${data.windSpeed}</p>
+          <p>Humidity: ${data.humidity}</p>
+    
+        `;
+      } else {
+        const errorData = await response.json();
+        resultDiv.textContent = `Error: ${errorData.error}`;
+      }
+    });
+  </script>
+</body>
+</html>

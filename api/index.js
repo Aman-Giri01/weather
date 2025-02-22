@@ -86,9 +86,11 @@
 
 import https from "https";
 
+// API details
 const API_KEY = `27cfc8d0c4b8df5f08069ec450b5cff7`;
 const BASE_URL = `https://api.openweathermap.org/data/2.5/weather`;
 
+// Function to fetch weather data
 const getWeather = (city) => {
   return new Promise((resolve, reject) => {
     const url = `${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`;
@@ -108,23 +110,41 @@ const getWeather = (city) => {
   });
 };
 
+// API handler
 export default async function handler(req, res) {
+  // Add CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle OPTIONS request for CORS preflight
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // Handle POST request
   if (req.method === "POST") {
     try {
-      // Vercel automatically parses JSON if the request header is set correctly.
-      const { cityName } = req.body;
-      if (!cityName) {
-        return res.status(400).json({ error: "City name is required" });
-      }
-      const weatherData = await getWeather(cityName);
-      const response = {
-        name: weatherData.name,
-        temp: weatherData.main.temp,
-        description: weatherData.weather[0].description,
-        windSpeed: weatherData.wind.speed,
-        humidity: weatherData.main.humidity,
-      };
-      res.status(200).json(response);
+      let body = "";
+      req.on("data", (chunk) => (body += chunk));
+      req.on("end", async () => {
+        const { cityName } = JSON.parse(body);
+
+        if (!cityName) {
+          return res.status(400).json({ error: "City name is required" });
+        }
+
+        const weatherData = await getWeather(cityName);
+        const response = {
+          name: weatherData.name,
+          temp: weatherData.main.temp,
+          description: weatherData.weather[0].description,
+          windSpeed: weatherData.wind.speed,
+          humidity: weatherData.main.humidity,
+        };
+
+        res.status(200).json(response);
+      });
     } catch (error) {
       res.status(500).json({ error: "Unable to fetch weather data" });
     }

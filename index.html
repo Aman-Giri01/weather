@@ -23,32 +23,38 @@
     document.getElementById('formdata').addEventListener('submit', async (event) => {
       event.preventDefault();
 
-      // Get the city name from the form
       const formdata = new FormData(event.target);
       const cityName = formdata.get('cityName');
-
-      // Send POST request to the server
-      const response = await fetch('/find', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cityName }),
-      });
-
       const resultDiv = document.getElementById('result');
 
-      if (response.ok) {
+      if (!cityName) {
+        resultDiv.textContent = "Please enter a city name!";
+        return;
+      }
+
+      resultDiv.innerHTML = "<p>Fetching data...</p>";  // Show loading message
+
+      try {
+        const response = await fetch('/api/index', {  // UPDATED API URL
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cityName }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
         const data = await response.json();
         resultDiv.innerHTML = `
-          <h2>Weather in ${data.name}</h3>
+          <h2>Weather in ${data.name}</h2>
           <p>Temperature: ${data.temp}°C</p>
           <p>Description: ${data.description}</p>
-          <p>Wind Speed: ${data.windSpeed}</p>
-          <p>Humidity: ${data.humidity}</p>
-    
+          <p>Wind Speed: ${data.windSpeed} m/s</p>
+          <p>Humidity: ${data.humidity}%</p>
         `;
-      } else {
-        const errorData = await response.json();
-        resultDiv.textContent = `Error: ${errorData.error}`;
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
       }
     });
   </script>

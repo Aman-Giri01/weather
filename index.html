@@ -21,16 +21,38 @@
   <div class="container">
     <form id="formdata">
         <input type="text" id="cityName" name="cityName" placeholder="Search">
-        <button type="submit"><i class="fas fa-search">Find</i></button>
+        <button type="submit"><i class="fas fa-search"></i></button>
     </form>
    
     <div class="result" id="result">
+      <div class="weather">
+        <i class="fas  fa-cloud"></i>
+        <div class="temp"></div>
+        <div class="city"></div>
+        <div class="description"></div>
+    </div>
+
+    <div class="weather-details">
+        <span><i class="fas fa-tint"></i></span>
+        <span><i class="fas fa-wind"></i></span>
+    </div>
         
     </div>
     
 </div>
 
   <script>
+      function getWeatherIcon(description) {
+      description = description.toLowerCase();
+      if (description.includes("clear")) return "fa-sun";
+      if (description.includes("cloud")) return "fa-cloud";
+      if (description.includes("rain")) return "fa-cloud-showers-heavy";
+      if (description.includes("storm") || description.includes("thunder")) return "fa-bolt";
+      if (description.includes("snow")) return "fa-snowflake";
+      if (description.includes("mist") || description.includes("fog")) return "fa-smog";
+      return "fa-cloud-sun"; // Default icon
+  }
+
     document.getElementById('formdata').addEventListener('submit', async (event) => {
       event.preventDefault();
 

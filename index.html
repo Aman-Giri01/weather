@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="container">
+  <!-- <div class="container">
     <h2>Weather App</h2>
     <form id="formdata">
       <div>
@@ -17,7 +17,18 @@
       <button type="submit">Find</button>
     </form>
     <div class="result" id="result"></div>
-  </div>
+  </div> -->
+  <div class="container">
+    <form id="formdata">
+        <input type="text" id="cityName" placeholder="Search">
+        <button type="submit"><i class="fas fa-search"></i></button>
+    </form>
+   
+    <div class="result" id="result">
+        
+    </div>
+    
+</div>
 
   <script>
     document.getElementById('formdata').addEventListener('submit', async (event) => {
@@ -46,13 +57,27 @@
         }
 
         const data = await response.json();
+        // resultDiv.innerHTML = `
+        //   <h2>Weather in ${data.name}</h2>
+        //   <p>Temperature: ${data.temp}°C</p>
+        //   <p>Description: ${data.description}</p>
+        //   <p>Wind Speed: ${data.windSpeed} m/s</p>
+        //   <p>Humidity: ${data.humidity}%</p>
+        // `;
+
         resultDiv.innerHTML = `
-          <h2>Weather in ${data.name}</h2>
-          <p>Temperature: ${data.temp}°C</p>
-          <p>Description: ${data.description}</p>
-          <p>Wind Speed: ${data.windSpeed} m/s</p>
-          <p>Humidity: ${data.humidity}%</p>
-        `;
+          <div class="weather">
+              <i class="fas ${getWeatherIcon(data.description)} weather-icon"></i>
+              <div class="temp">${data.temp}°C</div>
+              <div class="city">${data.name}</div>
+              <div class="description">${data.description}</div>
+          </div>
+
+          <div class="weather-details">
+              <span><i class="fas fa-tint"></i> ${data.humidity}% Humidity</span>
+              <span><i class="fas fa-wind"></i> ${data.windSpeed} m/s Wind</span>
+          </div>
+      `;
       } catch (error) {
         resultDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
       }
